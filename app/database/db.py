@@ -5,17 +5,18 @@ import os
 migrate = Migrate()
 
 def init_db(app):
-    # Remove o banco de dados existente se existir
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'database.db')
-    if os.path.exists(db_path):
-        os.remove(db_path)
-        print("Banco de dados antigo removido.")
-
+    # Inicializa o Flask-Migrate
     migrate.init_app(app, db)
     
     with app.app_context():
+        # Cria as tabelas se não existirem
         db.create_all()
+        
+        # Verifica se já existe um usuário admin
         from app.services.auth_service import AuthService
         auth_service = AuthService()
-        auth_service.criar_admin_padrao()
-        print("Banco de dados recriado com sucesso!")
+        
+        # Cria o usuário admin apenas se não existir
+        if not auth_service.verificar_admin_existe():
+            auth_service.criar_admin_padrao()
+            print("Usuário admin criado com sucesso!")

@@ -1,12 +1,24 @@
 import bcrypt
-from app import db
+from app import db, login_manager
+from flask_login import UserMixin
+from datetime import datetime
 
-class Professor(db.Model):
+@login_manager.user_loader
+def load_user(user_id):
+    return Professor.query.get(int(user_id))
+
+class Professor(db.Model, UserMixin):
     __tablename__ = 'professoras'
     
     id = db.Column(db.Integer, primary_key=True)
     usuario = db.Column(db.String(80), unique=True, nullable=False)
-    senha_hash = db.Column(db.String(255))  # Aumentado para acomodar o hash bcrypt
+    senha_hash = db.Column(db.String(255))
+    nome = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    telefone = db.Column(db.String(20))
+    disciplina = db.Column(db.String(50))
+    data_cadastro = db.Column(db.DateTime, default=datetime.utcnow)
+    ativo = db.Column(db.Boolean, default=True)
 
     def set_senha(self, senha):
         try:
@@ -41,5 +53,18 @@ class Professor(db.Model):
             print(f"❌ Erro ao verificar senha: {str(e)}")
             return False
 
+    def to_dict(self):
+        """Converte o objeto em um dicionário para serialização."""
+        return {
+            'id': self.id,
+            'usuario': self.usuario,
+            'nome': self.nome,
+            'email': self.email,
+            'telefone': self.telefone,
+            'disciplina': self.disciplina,
+            'data_cadastro': self.data_cadastro.isoformat() if self.data_cadastro else None,
+            'ativo': self.ativo
+        }
+
     def __repr__(self):
-        return f'<Professor {self.usuario}>' 
+        return f'<Professor {self.nome} ({self.usuario})>' 

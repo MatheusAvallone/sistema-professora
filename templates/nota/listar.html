@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Notas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Notas</h2>
+        <a href="{{ url_for('nota.cadastrar') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nova Nota
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Bimestre</th>
+                            <th>Data</th>
+                            <th>Professor</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nota in notas %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('nota.listar_por_aluno', aluno_id=nota.aluno_id) }}" 
+                                   class="text-decoration-none">
+                                    {{ nota.aluno.nome }}
+                                </a>
+                            </td>
+                            <td>{{ "%.1f"|format(nota.valor) }}</td>
+                            <td>{{ nota.tipo_avaliacao }}</td>
+                            <td>{{ nota.bimestre }}º</td>
+                            <td>{{ nota.data_avaliacao.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ nota.professor.nome }}</td>
+                            <td>
+                                <a href="{{ url_for('nota.editar', id=nota.id) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="confirmarExclusao('{{ nota.id }}', '{{ nota.aluno.nome }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Nenhuma nota cadastrada.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir a nota do aluno <span id="nomeAluno"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="#" id="btnConfirmarExclusao" class="btn btn-danger">Excluir</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmarExclusao(id, nome) {
+    document.getElementById('nomeAluno').textContent = nome;
+    document.getElementById('btnConfirmarExclusao').href = "{{ url_for('nota.excluir', id=0) }}".replace('0', id);
+    new bootstrap.Modal(document.getElementById('modalConfirmacao')).show();
+}
+</script>
+{% endblock %} 

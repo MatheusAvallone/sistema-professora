@@ -1,19 +1,9 @@
-from flask import Blueprint, render_template, session, redirect, url_for
-from functools import wraps
+from flask import Blueprint, render_template
+from flask_login import login_required, current_user
 
-painel_bp = Blueprint('painel', __name__, url_prefix='/painel')
+painel_bp = Blueprint('painel', __name__)
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get("logado"):
-            print("❌ Usuário não está logado, redirecionando para login...")
-            return redirect(url_for('auth.login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-@painel_bp.route('/')
+@painel_bp.route('/painel')
 @login_required
 def index():
-    print("✅ Renderizando página do painel...")
-    return render_template('painel/index.html', usuario=session.get('usuario'))
+    return render_template('painel/index.html', usuario=current_user)

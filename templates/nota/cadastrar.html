@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar Nota{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Cadastrar Nova Nota</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('nota.cadastrar') }}">
+                        <div class="mb-3">
+                            <label for="aluno_id" class="form-label">Aluno</label>
+                            <select class="form-select" id="aluno_id" name="aluno_id" required>
+                                <option value="">Selecione um aluno</option>
+                                {% for aluno in alunos %}
+                                <option value="{{ aluno.id }}" {% if request.args.get('aluno_id')|int == aluno.id %}selected{% endif %}>
+                                    {{ aluno.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="valor" class="form-label">Valor da Nota</label>
+                            <input type="number" class="form-control" id="valor" name="valor" 
+                                   step="0.1" min="0" max="10" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tipo_avaliacao" class="form-label">Tipo de Avaliação</label>
+                            <select class="form-select" id="tipo_avaliacao" name="tipo_avaliacao" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="Prova">Prova</option>
+                                <option value="Trabalho">Trabalho</option>
+                                <option value="Apresentação">Apresentação</option>
+                                <option value="Participação">Participação</option>
+                                <option value="Exercício">Exercício</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bimestre" class="form-label">Bimestre</label>
+                            <select class="form-select" id="bimestre" name="bimestre" required>
+                                <option value="">Selecione o bimestre</option>
+                                <option value="1">1º Bimestre</option>
+                                <option value="2">2º Bimestre</option>
+                                <option value="3">3º Bimestre</option>
+                                <option value="4">4º Bimestre</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="data_avaliacao" class="form-label">Data da Avaliação</label>
+                            <input type="date" class="form-control" id="data_avaliacao" name="data_avaliacao" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="peso" class="form-label">Peso da Nota</label>
+                            <input type="number" class="form-control" id="peso" name="peso" 
+                                   step="0.5" min="0.5" value="1.0" required>
+                            <div class="form-text">Peso padrão é 1.0</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('nota.listar') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Cadastrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Define a data atual como padrão
+    document.getElementById('data_avaliacao').valueAsDate = new Date();
+});
+</script>
+{% endblock %} 

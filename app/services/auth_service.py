@@ -1,6 +1,10 @@
 from app.models.professor import Professor, db
 
 class AuthService:
+    def verificar_admin_existe(self):
+        """Verifica se já existe um usuário admin no sistema"""
+        return Professor.query.filter_by(usuario='admin').first() is not None
+
     def verificar_login(self, usuario, senha):
         professor = Professor.query.filter_by(usuario=usuario).first()
         print(f"Tentativa de login - Usuário: {usuario}")
@@ -19,7 +23,13 @@ class AuthService:
             admin = Professor.query.filter_by(usuario='admin').first()
             if not admin:
                 print("Criando usuário admin...")
-                admin = Professor(usuario='admin')
+                admin = Professor(
+                    usuario='admin',
+                    nome='Administrador',
+                    email='admin@sistema.com',
+                    disciplina='Administração',
+                    ativo=True
+                )
                 admin.set_senha('1234')
                 db.session.add(admin)
                 db.session.commit()
@@ -36,25 +46,36 @@ class AuthService:
                         print("❌ Erro na verificação da senha do admin!")
             else:
                 print("⚠️ Usuário admin já existe!")
-                # Atualiza a senha do admin existente
+                # Atualiza os dados do admin existente
+                admin.nome = 'Administrador'
+                admin.email = 'admin@sistema.com'
+                admin.disciplina = 'Administração'
+                admin.ativo = True
                 admin.set_senha('1234')
                 db.session.commit()
-                print("✅ Senha do admin atualizada!")
+                print("✅ Dados do admin atualizados!")
         except Exception as e:
             print(f"❌ Erro ao criar/atualizar admin: {str(e)}")
             db.session.rollback()
 
-    def criar_professor(self, usuario, senha):
+    def criar_professor(self, dados):
         """Cria um novo professor com senha hasheada"""
         try:
-            if not Professor.query.filter_by(usuario=usuario).first():
-                professor = Professor(usuario=usuario)
-                professor.set_senha(senha)
+            if not Professor.query.filter_by(usuario=dados['usuario']).first():
+                professor = Professor(
+                    usuario=dados['usuario'],
+                    nome=dados['nome'],
+                    email=dados['email'],
+                    telefone=dados['telefone'],
+                    disciplina=dados['disciplina'],
+                    ativo=True
+                )
+                professor.set_senha(dados['senha'])
                 db.session.add(professor)
                 db.session.commit()
-                print(f"✅ Professor {usuario} criado com sucesso!")
+                print(f"✅ Professor {dados['usuario']} criado com sucesso!")
                 return True
-            print(f"⚠️ Professor {usuario} já existe!")
+            print(f"⚠️ Professor {dados['usuario']} já existe!")
             return False
         except Exception as e:
             print(f"❌ Erro ao criar professor: {str(e)}")
