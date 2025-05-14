@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Evento{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Novo Evento</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="titulo" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="titulo" name="titulo" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="data_inicio" class="form-label">Data e Hora de Início</label>
+                                    <input type="datetime-local" class="form-control" id="data_inicio" 
+                                           name="data_inicio" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="data_fim" class="form-label">Data e Hora de Término</label>
+                                    <input type="datetime-local" class="form-control" id="data_fim" 
+                                           name="data_fim" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="local" class="form-label">Local</label>
+                            <input type="text" class="form-control" id="local" name="local">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="publico_alvo" class="form-label">Público-Alvo</label>
+                            <select class="form-select" id="publico_alvo" name="publico_alvo" required>
+                                <option value="Todos">Todos</option>
+                                <option value="Alunos">Alunos</option>
+                                <option value="Professores">Professores</option>
+                                <option value="Responsáveis">Responsáveis</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tipo_id" class="form-label">Tipo de Evento</label>
+                            <select class="form-select" id="tipo_id" name="tipo_id" required>
+                                <option value="">Selecione o tipo</option>
+                                {% for tipo in tipos_evento %}
+                                    <option value="{{ tipo.id }}" data-cor="{{ tipo.cor }}">
+                                        {{ tipo.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('calendario.index') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Cadastrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Define a data atual como valor mínimo
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = (now.getMonth() + 1).toString().padStart(2, '0');
+    var day = now.getDate().toString().padStart(2, '0');
+    var hours = now.getHours().toString().padStart(2, '0');
+    var minutes = now.getMinutes().toString().padStart(2, '0');
+    var minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    
+    document.getElementById('data_inicio').min = minDateTime;
+    document.getElementById('data_fim').min = minDateTime;
+    
+    // Validação de datas
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var dataInicio = document.getElementById('data_inicio').value;
+        var dataFim = document.getElementById('data_fim').value;
+        
+        if (dataInicio >= dataFim) {
+            e.preventDefault();
+            alert('A data/hora de término deve ser posterior à data/hora de início.');
+        }
+    });
+    
+    // Atualiza data de término quando data de início é alterada
+    document.getElementById('data_inicio').addEventListener('change', function() {
+        var dataInicio = this.value;
+        var dataFim = document.getElementById('data_fim');
+        if (dataFim.value < dataInicio) {
+            dataFim.value = dataInicio;
+        }
+        dataFim.min = dataInicio;
+    });
+});
+</script>
+{% endblock %} 

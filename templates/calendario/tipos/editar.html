@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Tipo de Evento{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.2/dist/themes/classic.min.css"/>
+<style>
+    .color-picker {
+        margin-top: 10px;
+    }
+    .pcr-app {
+        z-index: 1100;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Editar Tipo de Evento</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome" name="nome" 
+                                   value="{{ tipo.nome }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cor" class="form-label">Cor</label>
+                            <input type="text" class="form-control" id="cor" name="cor" 
+                                   value="{{ tipo.cor }}" required readonly>
+                            <div class="color-picker"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="3">{{ tipo.descricao }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('calendario.listar_tipos') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                            <a href="{{ url_for('calendario.excluir_tipo', id=tipo.id) }}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Tem certeza que deseja excluir este tipo de evento?')">
+                                Excluir
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.2/dist/pickr.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializa o color picker
+    const pickr = Pickr.create({
+        el: '.color-picker',
+        theme: 'classic',
+        default: '{{ tipo.cor }}',
+        swatches: [
+            '#3788d8', // Azul (padrão)
+            '#28a745', // Verde
+            '#dc3545', // Vermelho
+            '#ffc107', // Amarelo
+            '#6f42c1', // Roxo
+            '#fd7e14', // Laranja
+            '#20c997', // Verde água
+            '#e83e8c'  // Rosa
+        ],
+        components: {
+            preview: true,
+            opacity: false,
+            hue: true,
+            interaction: {
+                hex: true,
+                rgba: true,
+                input: true,
+                clear: false,
+                save: true
+            }
+        }
+    });
+
+    // Atualiza o input quando a cor é alterada
+    pickr.on('save', (color, instance) => {
+        const hexColor = color.toHEXA().toString();
+        document.getElementById('cor').value = hexColor;
+        instance.hide();
+    });
+});
+</script>
+{% endblock %} 

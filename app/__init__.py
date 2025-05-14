@@ -38,6 +38,9 @@ def create_app(config_name='default'):
     from app.controllers.nota_controller import nota_bp
     from app.controllers.turma_controller import turma_bp
     from app.controllers.horario_controller import horario_bp
+    from app.controllers.calendario_controller import calendario_bp
+    from app.controllers.plano_aula_controller import plano_aula
+    from app.controllers.recurso_controller import recursos
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(painel_bp)
@@ -46,6 +49,9 @@ def create_app(config_name='default'):
     app.register_blueprint(nota_bp)
     app.register_blueprint(turma_bp)
     app.register_blueprint(horario_bp)
+    app.register_blueprint(calendario_bp)
+    app.register_blueprint(plano_aula)
+    app.register_blueprint(recursos)
 
     @app.route('/')
     def index():

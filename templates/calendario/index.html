@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Calendário Acadêmico{% endblock %}
+
+{% block styles %}
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/main.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/main.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/main.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/main.min.css" rel="stylesheet">
+<style>
+    .fc-event {
+        cursor: pointer;
+    }
+    .proximos-eventos {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Calendário -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">Calendário Acadêmico</h3>
+                    <div>
+                        <a href="{{ url_for('calendario.cadastrar_evento') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Novo Evento
+                        </a>
+                        <a href="{{ url_for('calendario.listar_tipos') }}" class="btn btn-secondary">
+                            <i class="fas fa-tags"></i> Tipos de Evento
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos Eventos -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Próximos Eventos</h4>
+                </div>
+                <div class="card-body proximos-eventos">
+                    {% if proximos_eventos %}
+                        <div class="list-group">
+                            {% for evento in proximos_eventos %}
+                                <a href="{{ url_for('calendario.editar_evento', id=evento.id) }}" 
+                                   class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ evento.titulo }}</h6>
+                                        <small class="text-muted">
+                                            {{ evento.data_inicio.strftime('%d/%m/%Y') }}
+                                        </small>
+                                    </div>
+                                    <p class="mb-1">{{ evento.descricao[:100] + '...' if evento.descricao else '' }}</p>
+                                    <small class="text-muted">
+                                        <span class="badge" style="background-color: {{ evento.tipo_evento.cor }}">
+                                            {{ evento.tipo_evento.nome }}
+                                        </span>
+                                    </small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">Nenhum evento próximo.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Legenda -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Legenda</h4>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for tipo in tipos_evento %}
+                            <div class="list-group-item">
+                                <span class="badge" style="background-color: {{ tipo.cor }}">
+                                    {{ tipo.nome }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalhes do Evento -->
+<div class="modal fade" id="eventoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes do Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="eventoTitulo"></h4>
+                <p id="eventoDescricao" class="text-muted"></p>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Início:</strong> <span id="eventoInicio"></span></p>
+                        <p><strong>Fim:</strong> <span id="eventoFim"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Local:</strong> <span id="eventoLocal"></span></p>
+                        <p><strong>Público:</strong> <span id="eventoPublico"></span></p>
+                    </div>
+                </div>
+                <p><strong>Status:</strong> <span id="eventoStatus"></span></p>
+                <p><strong>Responsável:</strong> <span id="eventoProfessor"></span></p>
+            </div>
+            <div class="modal-footer">
+                <a id="btnEditarEvento" href="#" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/pt-br.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        buttonText: {
+            today: 'Hoje',
+            month: 'Mês',
+            week: 'Semana',
+            list: 'Lista'
+        },
+        height: 'auto',
+        navLinks: true,
+        editable: false,
+        dayMaxEvents: true,
+        events: function(fetchInfo, successCallback, failureCallback) {
+            fetch(`/calendario/eventos?mes=${fetchInfo.start.getMonth() + 1}&ano=${fetchInfo.start.getFullYear()}`)
+                .then(response => response.json())
+                .then(data => {
+                    const eventos = data.map(evento => ({
+                        id: evento.id,
+                        title: evento.titulo,
+                        start: evento.data_inicio,
+                        end: evento.data_fim,
+                        backgroundColor: evento.tipo_cor,
+                        borderColor: evento.tipo_cor,
+                        extendedProps: {
+                            descricao: evento.descricao,
+                            local: evento.local,
+                            publico_alvo: evento.publico_alvo,
+                            status: evento.status,
+                            professor: evento.professor_nome,
+                            tipo: evento.tipo_nome
+                        }
+                    }));
+                    successCallback(eventos);
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar eventos:', error);
+                    failureCallback(error);
+                });
+        },
+        eventClick: function(info) {
+            const evento = info.event;
+            const modal = new bootstrap.Modal(document.getElementById('eventoModal'));
+            
+            // Formata as datas para exibição
+            const dataInicio = new Date(evento.start).toLocaleString('pt-BR', {
+                dateStyle: 'long',
+                timeStyle: 'short'
+            });
+            const dataFim = new Date(evento.end).toLocaleString('pt-BR', {
+                dateStyle: 'long',
+                timeStyle: 'short'
+            });
+            
+            // Preenche os dados do modal
+            document.getElementById('eventoTitulo').textContent = evento.title;
+            document.getElementById('eventoDescricao').textContent = evento.extendedProps.descricao || 'Sem descrição';
+            document.getElementById('eventoInicio').textContent = dataInicio;
+            document.getElementById('eventoFim').textContent = dataFim;
+            document.getElementById('eventoLocal').textContent = evento.extendedProps.local || 'Não definido';
+            document.getElementById('eventoPublico').textContent = evento.extendedProps.publico_alvo;
+            document.getElementById('eventoStatus').textContent = evento.extendedProps.status;
+            document.getElementById('eventoProfessor').textContent = evento.extendedProps.professor || 'Não definido';
+            
+            // Configura o botão de editar
+            document.getElementById('btnEditarEvento').href = `/calendario/eventos/editar/${evento.id}`;
+            
+            modal.show();
+        }
+    });
+    
+    calendar.render();
+});
+</script>
+{% endblock %} 

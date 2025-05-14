@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Editar Recurso</h2>
+        <a href="{{ url_for('recursos.listar') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="titulo" class="form-label">Título *</label>
+                    <input type="text" class="form-control" id="titulo" name="titulo" 
+                           value="{{ recurso.titulo }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <textarea class="form-control" id="descricao" name="descricao" 
+                              rows="3">{{ recurso.descricao }}</textarea>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="tipo" class="form-label">Tipo *</label>
+                        <select class="form-select" id="tipo" name="tipo" required onchange="toggleCampos()">
+                            <option value="">Selecione...</option>
+                            <option value="documento" {% if recurso.tipo == 'documento' %}selected{% endif %}>
+                                Documento
+                            </option>
+                            <option value="link" {% if recurso.tipo == 'link' %}selected{% endif %}>
+                                Link
+                            </option>
+                            <option value="arquivo" {% if recurso.tipo == 'arquivo' %}selected{% endif %}>
+                                Arquivo
+                            </option>
+                            <option value="video" {% if recurso.tipo == 'video' %}selected{% endif %}>
+                                Vídeo
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="disciplina" class="form-label">Disciplina</label>
+                        <input type="text" class="form-control" id="disciplina" name="disciplina" 
+                               value="{{ recurso.disciplina }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="serie" class="form-label">Série</label>
+                        <input type="text" class="form-control" id="serie" name="serie" 
+                               value="{{ recurso.serie }}">
+                    </div>
+                </div>
+
+                <div id="campoUrl" class="mb-3" style="display: none;">
+                    <label for="url" class="form-label">URL</label>
+                    <input type="url" class="form-control" id="url" name="url" 
+                           value="{{ recurso.url }}">
+                </div>
+
+                <div id="campoArquivo" class="mb-3" style="display: none;">
+                    <label for="arquivo" class="form-label">Arquivo</label>
+                    {% if recurso.arquivo_path %}
+                    <div class="alert alert-info">
+                        Arquivo atual: {{ recurso.arquivo_path.split('/')[-1] }}
+                        <a href="{{ url_for('recursos.download', id=recurso.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </div>
+                    {% endif %}
+                    <input type="file" class="form-control" id="arquivo" name="arquivo">
+                    <small class="text-muted">Deixe em branco para manter o arquivo atual</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="tags" class="form-label">Tags (separadas por vírgula)</label>
+                    <input type="text" class="form-control" id="tags" name="tags" 
+                           value="{{ recurso.tags }}"
+                           placeholder="Ex: matemática, exercícios, fundamental">
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleCampos() {
+    const tipo = document.getElementById('tipo').value;
+    const campoUrl = document.getElementById('campoUrl');
+    const campoArquivo = document.getElementById('campoArquivo');
+    
+    campoUrl.style.display = 'none';
+    campoArquivo.style.display = 'none';
+    
+    if (tipo === 'link' || tipo === 'video') {
+        campoUrl.style.display = 'block';
+    } else if (tipo === 'documento' || tipo === 'arquivo') {
+        campoArquivo.style.display = 'block';
+    }
+}
+
+// Mostrar campos corretos ao carregar a página
+document.addEventListener('DOMContentLoaded', toggleCampos);
+</script>
+{% endblock %} 

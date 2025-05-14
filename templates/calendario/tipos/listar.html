@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Tipos de Evento{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Tipos de Evento</h2>
+        <a href="{{ url_for('calendario.cadastrar_tipo') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Tipo
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Cor</th>
+                            <th>Descrição</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tipo in tipos %}
+                        <tr>
+                            <td>{{ tipo.nome }}</td>
+                            <td>
+                                <span class="badge" style="background-color: {{ tipo.cor }}">
+                                    {{ tipo.cor }}
+                                </span>
+                            </td>
+                            <td>{{ tipo.descricao or '-' }}</td>
+                            <td>
+                                <a href="{{ url_for('calendario.editar_tipo', id=tipo.id) }}" 
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('calendario.excluir_tipo', id=tipo.id) }}" 
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Tem certeza que deseja excluir este tipo de evento?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">Nenhum tipo de evento cadastrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

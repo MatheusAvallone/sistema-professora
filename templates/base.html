@@ -58,6 +58,18 @@
                        href="{{ url_for('professor.listar') }}">
                         <i class="fas fa-users"></i> Professores
                     </a>
+                    <a class="nav-link {% if 'calendario.' in request.endpoint %}active{% endif %}" 
+                       href="{{ url_for('calendario.index') }}">
+                        <i class="fas fa-calendar-alt"></i> Calendário
+                    </a>
+                    <a class="nav-link {% if 'plano_aula.' in request.endpoint %}active{% endif %}" 
+                       href="{{ url_for('plano_aula.listar') }}">
+                        <i class="fas fa-chalkboard-teacher"></i> Planos de Aula
+                    </a>
+                    <a class="nav-link {% if 'recursos.' in request.endpoint %}active{% endif %}" 
+                       href="{{ url_for('recursos.listar') }}">
+                        <i class="fas fa-book"></i> Recursos
+                    </a>
                     <hr class="bg-secondary">
                     <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
                         <i class="fas fa-sign-out-alt"></i> Sair

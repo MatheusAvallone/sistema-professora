@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Visualizar Plano de Aula{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">{{ plano.titulo }}</h3>
+                    <div>
+                        <a href="{{ url_for('plano_aula.editar', id=plano.id) }}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{{ url_for('plano_aula.listar') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Informações Básicas -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Informações Gerais</h5>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="120">Disciplina:</th>
+                                    <td>{{ plano.disciplina }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Série/Turma:</th>
+                                    <td>{{ plano.serie }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Data:</th>
+                                    <td>{{ plano.data_aula.strftime('%d/%m/%Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Duração:</th>
+                                    <td>{{ plano.duracao }} minutos</td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td>
+                                        <span class="badge {% if plano.status == 'Aprovado' %}bg-success
+                                                         {% elif plano.status == 'Revisão' %}bg-warning
+                                                         {% else %}bg-secondary{% endif %}">
+                                            {{ plano.status }}
+                                        </span>
+                                        {% if plano.status != 'Aprovado' %}
+                                            <a href="{{ url_for('plano_aula.atualizar_status', id=plano.id, status='Aprovado') }}" 
+                                               class="btn btn-sm btn-success ms-2">
+                                                Aprovar
+                                            </a>
+                                        {% endif %}
+                                        {% if plano.status != 'Revisão' %}
+                                            <a href="{{ url_for('plano_aula.atualizar_status', id=plano.id, status='Revisão') }}" 
+                                               class="btn btn-sm btn-warning ms-2">
+                                                Solicitar Revisão
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Professor</h5>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="120">Nome:</th>
+                                    <td>{{ plano.professor.nome }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Criado em:</th>
+                                    <td>{{ plano.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Atualizado:</th>
+                                    <td>{{ plano.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Detalhes do Plano -->
+                    <div class="mb-4">
+                        <h5>Objetivos</h5>
+                        <p class="mb-4">{{ plano.objetivos|nl2br }}</p>
+
+                        <h5>Conteúdo</h5>
+                        <p class="mb-4">{{ plano.conteudo|nl2br }}</p>
+
+                        <h5>Metodologia</h5>
+                        <p class="mb-4">{{ plano.metodologia|nl2br }}</p>
+
+                        <h5>Recursos Necessários</h5>
+                        <p class="mb-4">{{ plano.recursos|nl2br }}</p>
+
+                        <h5>Avaliação</h5>
+                        <p class="mb-4">{{ plano.avaliacao|nl2br }}</p>
+
+                        {% if plano.observacoes %}
+                            <h5>Observações</h5>
+                            <p>{{ plano.observacoes|nl2br }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -96,6 +96,23 @@
             <div class="card h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
+                        <div class="bg-purple text-white rounded p-3 me-3">
+                            <i class="fas fa-book fa-2x"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Recursos</h5>
+                    </div>
+                    <p class="card-text">Gerencie materiais didáticos e recursos educacionais.</p>
+                    <a href="{{ url_for('recursos.listar') }}" class="btn btn-purple">
+                        <i class="fas fa-arrow-right"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
                         <div class="bg-danger text-white rounded p-3 me-3">
                             <i class="fas fa-chart-bar fa-2x"></i>
                         </div>
@@ -110,4 +127,18 @@
         </div>
     </div>
 </div>
+
+<style>
+.bg-purple {
+    background-color: #6f42c1;
+}
+.btn-purple {
+    background-color: #6f42c1;
+    color: white;
+}
+.btn-purple:hover {
+    background-color: #5a32a3;
+    color: white;
+}
+</style>
 {% endblock %} 

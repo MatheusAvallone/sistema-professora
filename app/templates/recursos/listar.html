@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Meus Recursos</h2>
+        <a href="{{ url_for('recursos.criar') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Recurso
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="tipo" class="form-label">Tipo</label>
+                    <select name="tipo" id="tipo" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="documento">Documento</option>
+                        <option value="link">Link</option>
+                        <option value="arquivo">Arquivo</option>
+                        <option value="video">Vídeo</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="disciplina" class="form-label">Disciplina</label>
+                    <input type="text" name="disciplina" id="disciplina" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label for="serie" class="form-label">Série</label>
+                    <input type="text" name="serie" id="serie" class="form-control">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Recursos -->
+    <div class="row">
+        {% for recurso in recursos %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ recurso.titulo }}</h5>
+                    <p class="card-text text-muted">
+                        <small>
+                            <i class="fas fa-tag"></i> {{ recurso.tipo }}
+                            {% if recurso.disciplina %}
+                            | <i class="fas fa-book"></i> {{ recurso.disciplina }}
+                            {% endif %}
+                            {% if recurso.serie %}
+                            | <i class="fas fa-users"></i> {{ recurso.serie }}
+                            {% endif %}
+                        </small>
+                    </p>
+                    <p class="card-text">{{ recurso.descricao | truncate(100) }}</p>
+                    
+                    {% if recurso.tags %}
+                    <p class="card-text">
+                        {% for tag in recurso.tags.split(',') %}
+                        <span class="badge bg-secondary">{{ tag.strip() }}</span>
+                        {% endfor %}
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('recursos.visualizar', id=recurso.id) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ url_for('recursos.editar', id=recurso.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% if recurso.arquivo_path %}
+                        <a href="{{ url_for('recursos.download', id=recurso.id) }}" class="btn btn-outline-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        {% endif %}
+                        <button type="button" class="btn btn-outline-danger" 
+                                onclick="confirmarExclusao({{ recurso.id }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Nenhum recurso encontrado. <a href="{{ url_for('recursos.criar') }}">Criar novo recurso</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmarExclusaoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir este recurso?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExcluir" method="POST">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmarExclusao(id) {
+    const modal = new bootstrap.Modal(document.getElementById('confirmarExclusaoModal'));
+    const form = document.getElementById('formExcluir');
+    form.action = `/recursos/${id}/excluir`;
+    modal.show();
+}
+</script>
+{% endblock %} 

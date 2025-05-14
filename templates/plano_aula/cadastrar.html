@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Plano de Aula{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Novo Plano de Aula</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="titulo" class="form-label">Título da Aula</label>
+                                <input type="text" class="form-control" id="titulo" name="titulo" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="data_aula" class="form-label">Data da Aula</label>
+                                <input type="date" class="form-control" id="data_aula" name="data_aula" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="duracao" class="form-label">Duração (minutos)</label>
+                                <input type="number" class="form-control" id="duracao" name="duracao" 
+                                       min="1" value="50" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="disciplina" class="form-label">Disciplina</label>
+                                <input type="text" class="form-control" id="disciplina" name="disciplina" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="serie" class="form-label">Série/Turma</label>
+                                <input type="text" class="form-control" id="serie" name="serie" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="objetivos" class="form-label">Objetivos</label>
+                            <textarea class="form-control" id="objetivos" name="objetivos" 
+                                      rows="3" required></textarea>
+                            <div class="form-text">Descreva os objetivos de aprendizagem da aula.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="conteudo" class="form-label">Conteúdo</label>
+                            <textarea class="form-control" id="conteudo" name="conteudo" 
+                                      rows="3" required></textarea>
+                            <div class="form-text">Detalhe o conteúdo que será abordado.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="metodologia" class="form-label">Metodologia</label>
+                            <textarea class="form-control" id="metodologia" name="metodologia" 
+                                      rows="3" required></textarea>
+                            <div class="form-text">Descreva as estratégias e métodos que serão utilizados.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="recursos" class="form-label">Recursos Necessários</label>
+                            <textarea class="form-control" id="recursos" name="recursos" 
+                                      rows="2" required></textarea>
+                            <div class="form-text">Liste os materiais e recursos que serão utilizados.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="avaliacao" class="form-label">Avaliação</label>
+                            <textarea class="form-control" id="avaliacao" name="avaliacao" 
+                                      rows="2" required></textarea>
+                            <div class="form-text">Descreva como será feita a avaliação da aprendizagem.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="observacoes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="observacoes" name="observacoes" rows="2"></textarea>
+                            <div class="form-text">Adicione observações ou comentários adicionais (opcional).</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('plano_aula.listar') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Cadastrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Define a data mínima como hoje
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('data_aula').min = today;
+    
+    // Validação do formulário
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var duracao = document.getElementById('duracao').value;
+        if (duracao < 1) {
+            e.preventDefault();
+            alert('A duração da aula deve ser maior que zero.');
+        }
+    });
+});
+</script>
+{% endblock %} 
