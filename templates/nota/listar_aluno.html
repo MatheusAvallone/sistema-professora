@@ -27,7 +27,7 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Médias por Bimestre -->
+    <!-- Médias por Bimestre e Status -->
     <div class="row mb-4">
         {% for bimestre, media in medias.items() %}
         <div class="col-md-3 mb-3">
@@ -37,10 +37,23 @@
                     <p class="display-4 mb-0 {% if media < 6 %}text-danger{% else %}text-success{% endif %}">
                         {{ "%.1f"|format(media) }}
                     </p>
+                    <p class="mt-2 mb-0">
+                        <span class="badge {% if media >= 6 %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if media >= 6 %}Aprovado{% else %}Reprovado{% endif %}
+                        </span>
+                    </p>
                 </div>
             </div>
         </div>
         {% endfor %}
+    </div>
+
+    <!-- Total de Faltas -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Total de Faltas</h5>
+            <p class="display-6 mb-0">{{ total_faltas }} faltas</p>
+        </div>
     </div>
 
     <!-- Tabela de Notas -->
@@ -55,6 +68,7 @@
                             <th>Descrição</th>
                             <th>Bimestre</th>
                             <th>Data</th>
+                            <th>Faltas</th>
                             <th>Peso</th>
                             <th>Professor</th>
                             <th>Ações</th>
@@ -68,6 +82,7 @@
                             <td>{{ nota.descricao or '-' }}</td>
                             <td>{{ nota.bimestre }}º</td>
                             <td>{{ nota.data_avaliacao.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ nota.faltas }}</td>
                             <td>{{ "%.1f"|format(nota.peso) }}</td>
                             <td>{{ nota.professor.nome }}</td>
                             <td>
@@ -82,7 +97,7 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="8" class="text-center">Nenhuma nota cadastrada para este aluno.</td>
+                            <td colspan="9" class="text-center">Nenhuma nota cadastrada para este aluno.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

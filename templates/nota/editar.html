@@ -26,21 +26,27 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="tipo_avaliacao" class="form-label">Tipo de Avaliação</label>
+                            <select class="form-select" id="tipo_avaliacao" name="tipo_avaliacao" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="Avaliação 1" {% if nota.tipo_avaliacao == 'Avaliação 1' %}selected{% endif %}>Avaliação 1</option>
+                                <option value="Avaliação 2" {% if nota.tipo_avaliacao == 'Avaliação 2' %}selected{% endif %}>Avaliação 2</option>
+                                <option value="Atividade 1" {% if nota.tipo_avaliacao == 'Atividade 1' %}selected{% endif %}>Atividade 1</option>
+                                <option value="Atividade 2" {% if nota.tipo_avaliacao == 'Atividade 2' %}selected{% endif %}>Atividade 2</option>
+                                <option value="Atividade 3" {% if nota.tipo_avaliacao == 'Atividade 3' %}selected{% endif %}>Atividade 3</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="valor" class="form-label">Valor da Nota</label>
                             <input type="number" class="form-control" id="valor" name="valor" 
                                    step="0.1" min="0" max="10" value="{{ nota.valor }}" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="tipo_avaliacao" class="form-label">Tipo de Avaliação</label>
-                            <select class="form-select" id="tipo_avaliacao" name="tipo_avaliacao" required>
-                                <option value="">Selecione o tipo</option>
-                                <option value="Prova" {% if nota.tipo_avaliacao == 'Prova' %}selected{% endif %}>Prova</option>
-                                <option value="Trabalho" {% if nota.tipo_avaliacao == 'Trabalho' %}selected{% endif %}>Trabalho</option>
-                                <option value="Apresentação" {% if nota.tipo_avaliacao == 'Apresentação' %}selected{% endif %}>Apresentação</option>
-                                <option value="Participação" {% if nota.tipo_avaliacao == 'Participação' %}selected{% endif %}>Participação</option>
-                                <option value="Exercício" {% if nota.tipo_avaliacao == 'Exercício' %}selected{% endif %}>Exercício</option>
-                            </select>
+                            <label for="faltas" class="form-label">Quantidade de Faltas</label>
+                            <input type="number" class="form-control" id="faltas" name="faltas" 
+                                   min="0" value="{{ nota.faltas }}" required>
                         </div>
 
                         <div class="mb-3">

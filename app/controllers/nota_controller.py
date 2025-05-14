@@ -37,10 +37,14 @@ def listar_por_aluno(aluno_id):
         4: nota_service.calcular_media_bimestre(aluno_id, 4)
     }
     
+    # Calcula total de faltas
+    total_faltas = sum(nota.faltas for nota in notas)
+    
     return render_template('nota/listar_aluno.html', 
                          aluno=aluno, 
                          notas=notas, 
-                         medias=medias)
+                         medias=medias,
+                         total_faltas=total_faltas)
 
 @nota_bp.route('/notas/nova', methods=['GET', 'POST'])
 @login_required
@@ -53,6 +57,7 @@ def cadastrar():
             'bimestre': request.form.get('bimestre'),
             'tipo_avaliacao': request.form.get('tipo_avaliacao'),
             'peso': request.form.get('peso', 1.0),
+            'faltas': request.form.get('faltas', 0),
             'aluno_id': request.form.get('aluno_id'),
             'professor_id': current_user.id
         }
@@ -88,7 +93,8 @@ def editar(id):
             'data_avaliacao': request.form.get('data_avaliacao'),
             'bimestre': request.form.get('bimestre'),
             'tipo_avaliacao': request.form.get('tipo_avaliacao'),
-            'peso': request.form.get('peso', nota.peso)
+            'peso': request.form.get('peso', nota.peso),
+            'faltas': request.form.get('faltas', nota.faltas)
         }
         
         sucesso, resultado = nota_service.atualizar(id, dados)

@@ -33,21 +33,27 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="tipo_avaliacao" class="form-label">Tipo de Avaliação</label>
+                            <select class="form-select" id="tipo_avaliacao" name="tipo_avaliacao" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="Avaliação 1">Avaliação 1</option>
+                                <option value="Avaliação 2">Avaliação 2</option>
+                                <option value="Atividade 1">Atividade 1</option>
+                                <option value="Atividade 2">Atividade 2</option>
+                                <option value="Atividade 3">Atividade 3</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="valor" class="form-label">Valor da Nota</label>
                             <input type="number" class="form-control" id="valor" name="valor" 
                                    step="0.1" min="0" max="10" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="tipo_avaliacao" class="form-label">Tipo de Avaliação</label>
-                            <select class="form-select" id="tipo_avaliacao" name="tipo_avaliacao" required>
-                                <option value="">Selecione o tipo</option>
-                                <option value="Prova">Prova</option>
-                                <option value="Trabalho">Trabalho</option>
-                                <option value="Apresentação">Apresentação</option>
-                                <option value="Participação">Participação</option>
-                                <option value="Exercício">Exercício</option>
-                            </select>
+                            <label for="faltas" class="form-label">Quantidade de Faltas</label>
+                            <input type="number" class="form-control" id="faltas" name="faltas" 
+                                   min="0" value="0" required>
                         </div>
 
                         <div class="mb-3">

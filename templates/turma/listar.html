@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Turmas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Turmas</h2>
+        <a href="{{ url_for('turma.cadastrar') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nova Turma
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Ano</th>
+                            <th>Período</th>
+                            <th>Professor</th>
+                            <th>Capacidade</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for turma in turmas %}
+                        <tr>
+                            <td>{{ turma.nome }}</td>
+                            <td>{{ turma.ano }}</td>
+                            <td>{{ turma.periodo }}</td>
+                            <td>{{ turma.professor.nome if turma.professor else '-' }}</td>
+                            <td>{{ turma.capacidade or '-' }}</td>
+                            <td>
+                                <span class="badge {% if turma.ativa %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ 'Ativa' if turma.ativa else 'Inativa' }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('turma.editar', id=turma.id) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="confirmarExclusao('{{ turma.id }}', '{{ turma.nome }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Nenhuma turma cadastrada.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir a turma <span id="nomeTurma"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="#" id="btnConfirmarExclusao" class="btn btn-danger">Excluir</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmarExclusao(id, nome) {
+    document.getElementById('nomeTurma').textContent = nome;
+    document.getElementById('btnConfirmarExclusao').href = "{{ url_for('turma.excluir', id=0) }}".replace('0', id);
+    new bootstrap.Modal(document.getElementById('modalConfirmacao')).show();
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar Horário{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Cadastrar Novo Horário</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('horario.cadastrar') }}">
+                        <div class="mb-3">
+                            <label for="turma_id" class="form-label">Turma</label>
+                            <select class="form-select" id="turma_id" name="turma_id" required>
+                                <option value="">Selecione uma turma</option>
+                                {% for turma in turmas %}
+                                <option value="{{ turma.id }}">
+                                    {{ turma.nome }} - {{ turma.professor.nome if turma.professor else 'Sem professor' }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="dia_semana" class="form-label">Dia da Semana</label>
+                            <select class="form-select" id="dia_semana" name="dia_semana" required>
+                                <option value="">Selecione o dia</option>
+                                <option value="0">Segunda-feira</option>
+                                <option value="1">Terça-feira</option>
+                                <option value="2">Quarta-feira</option>
+                                <option value="3">Quinta-feira</option>
+                                <option value="4">Sexta-feira</option>
+                                <option value="5">Sábado</option>
+                                <option value="6">Domingo</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="hora_inicio" class="form-label">Hora de Início</label>
+                            <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="hora_fim" class="form-label">Hora de Término</label>
+                            <input type="time" class="form-control" id="hora_fim" name="hora_fim" required>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('horario.listar') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Cadastrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validação de horários
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var horaInicio = document.getElementById('hora_inicio').value;
+        var horaFim = document.getElementById('hora_fim').value;
+        
+        if (horaInicio >= horaFim) {
+            e.preventDefault();
+            alert('A hora de término deve ser posterior à hora de início.');
+        }
+    });
+});
+</script>
+{% endblock %} 

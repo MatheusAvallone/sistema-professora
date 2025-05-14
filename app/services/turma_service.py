@@ -19,26 +19,15 @@ class TurmaService:
             return None
 
     def cadastrar(self, dados):
-        """Cadastra uma nova turma com seus horários."""
+        """Cadastra uma nova turma."""
         try:
             turma = Turma(
                 nome=dados['nome'],
-                ano=dados['ano'],
+                ano=int(dados['ano']),
                 periodo=dados['periodo'],
-                capacidade=dados.get('capacidade'),
-                professor_id=dados.get('professor_id'),
-                ativa=True
+                capacidade=int(dados['capacidade']) if dados['capacidade'] else None,
+                professor_id=int(dados['professor_id']) if dados['professor_id'] else None
             )
-            
-            # Adiciona os horários
-            if 'horarios' in dados:
-                for h in dados['horarios']:
-                    horario = HorarioAula(
-                        dia_semana=h['dia_semana'],
-                        hora_inicio=time.fromisoformat(h['hora_inicio']),
-                        hora_fim=time.fromisoformat(h['hora_fim'])
-                    )
-                    turma.horarios.append(horario)
             
             db.session.add(turma)
             db.session.commit()
@@ -55,27 +44,11 @@ class TurmaService:
                 return False, "Turma não encontrada."
 
             turma.nome = dados['nome']
-            turma.ano = dados['ano']
+            turma.ano = int(dados['ano'])
             turma.periodo = dados['periodo']
-            turma.capacidade = dados.get('capacidade')
-            turma.professor_id = dados.get('professor_id')
-            turma.ativa = dados.get('ativa', turma.ativa)
-
-            # Atualiza os horários
-            if 'horarios' in dados:
-                # Remove os horários antigos
-                for horario in turma.horarios:
-                    db.session.delete(horario)
-                
-                # Adiciona os novos horários
-                for h in dados['horarios']:
-                    horario = HorarioAula(
-                        dia_semana=h['dia_semana'],
-                        hora_inicio=time.fromisoformat(h['hora_inicio']),
-                        hora_fim=time.fromisoformat(h['hora_fim']),
-                        turma_id=turma.id
-                    )
-                    db.session.add(horario)
+            turma.capacidade = int(dados['capacidade']) if dados['capacidade'] else None
+            turma.professor_id = int(dados['professor_id']) if dados['professor_id'] else None
+            turma.ativa = dados['ativa']
 
             db.session.commit()
             return True, turma
@@ -84,7 +57,7 @@ class TurmaService:
             return False, str(e)
 
     def excluir(self, id):
-        """Exclui uma turma e seus horários."""
+        """Exclui uma turma."""
         try:
             turma = self.buscar_por_id(id)
             if not turma:

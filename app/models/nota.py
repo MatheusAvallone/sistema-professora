@@ -9,7 +9,8 @@ class Nota(db.Model):
     descricao = db.Column(db.String(200))  # Descrição da avaliação
     data_avaliacao = db.Column(db.Date, nullable=False)
     bimestre = db.Column(db.Integer, nullable=False)  # 1, 2, 3 ou 4
-    tipo_avaliacao = db.Column(db.String(50), nullable=False)  # Prova, Trabalho, etc.
+    tipo_avaliacao = db.Column(db.String(50), nullable=False)  # Avaliação 1, Avaliação 2, Atividade 1, etc.
+    faltas = db.Column(db.Integer, default=0)  # Número de faltas
     peso = db.Column(db.Float, default=1.0)
     data_cadastro = db.Column(db.DateTime, default=datetime.utcnow)
     
@@ -31,6 +32,7 @@ class Nota(db.Model):
             'data_avaliacao': self.data_avaliacao.strftime('%Y-%m-%d'),
             'bimestre': self.bimestre,
             'tipo_avaliacao': self.tipo_avaliacao,
+            'faltas': self.faltas,
             'peso': self.peso,
             'aluno_id': self.aluno_id,
             'aluno_nome': self.aluno.nome if self.aluno else None,

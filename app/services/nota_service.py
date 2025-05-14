@@ -38,8 +38,22 @@ class NotaService:
             if not notas:
                 return 0.0
             
-            soma_ponderada = sum(nota.valor * nota.peso for nota in notas)
-            soma_pesos = sum(nota.peso for nota in notas)
+            # Pesos específicos para cada tipo de avaliação
+            pesos = {
+                'Avaliação 1': 3.0,
+                'Avaliação 2': 3.0,
+                'Atividade 1': 1.5,
+                'Atividade 2': 1.5,
+                'Atividade 3': 1.0
+            }
+            
+            soma_ponderada = 0
+            soma_pesos = 0
+            
+            for nota in notas:
+                peso = pesos.get(nota.tipo_avaliacao, 1.0)
+                soma_ponderada += nota.valor * peso
+                soma_pesos += peso
             
             return round(soma_ponderada / soma_pesos, 2) if soma_pesos > 0 else 0.0
         except SQLAlchemyError:
@@ -58,6 +72,7 @@ class NotaService:
                 bimestre=int(dados['bimestre']),
                 tipo_avaliacao=dados['tipo_avaliacao'],
                 peso=float(dados.get('peso', 1.0)),
+                faltas=int(dados.get('faltas', 0)),
                 aluno_id=int(dados['aluno_id']),
                 professor_id=int(dados['professor_id'])
             )
@@ -85,6 +100,7 @@ class NotaService:
             nota.bimestre = int(dados['bimestre'])
             nota.tipo_avaliacao = dados['tipo_avaliacao']
             nota.peso = float(dados.get('peso', nota.peso))
+            nota.faltas = int(dados.get('faltas', nota.faltas))
 
             db.session.commit()
             return True, nota

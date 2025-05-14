@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar Turma{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Cadastrar Nova Turma</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('turma.cadastrar') }}">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome da Turma</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ano" class="form-label">Ano</label>
+                            <input type="number" class="form-control" id="ano" name="ano" 
+                                   min="2000" max="2100" value="{{ current_year }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="periodo" class="form-label">Período</label>
+                            <select class="form-select" id="periodo" name="periodo" required>
+                                <option value="">Selecione o período</option>
+                                <option value="Manhã">Manhã</option>
+                                <option value="Tarde">Tarde</option>
+                                <option value="Noite">Noite</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="professor_id" class="form-label">Professor Responsável</label>
+                            <select class="form-select" id="professor_id" name="professor_id">
+                                <option value="">Selecione um professor</option>
+                                {% for professor in professores %}
+                                <option value="{{ professor.id }}">{{ professor.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="capacidade" class="form-label">Capacidade de Alunos</label>
+                            <input type="number" class="form-control" id="capacidade" name="capacidade" 
+                                   min="1" max="100">
+                            <div class="form-text">Deixe em branco para capacidade ilimitada</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('turma.listar') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Cadastrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Define o ano atual como padrão
+    var currentYear = new Date().getFullYear();
+    document.getElementById('ano').value = currentYear;
+});
+</script>
+{% endblock %} 
